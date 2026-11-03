@@ -1,6 +1,8 @@
 import { productData } from "./data/product.data";
 import { test } from "../src/fixtures/home.fixture";
 import { ProductPage } from "../src/pages/product";
+import { reviewData } from "./data/review.data";
+import { HomePage } from "../src/pages/home";
 
 test.describe("HOME", () => {
   test("HOME_001: Kiểm tra homepage hiển thị thành công", async ({
@@ -60,10 +62,41 @@ test.describe("PRODUCT", () => {
   });
 
   test("PRODUCT_002: Verify tinh nang product review hoat dong dung", async () => {
-    await test.step("Step 3: Mở tab Reviews và kiểm tra formc", async () => {
+    await test.step("Step 3: Mở tab Reviews và kiểm tra form", async () => {
       await productPage.clickReviewTab();
       await productPage.noReview();
       await productPage.verifyFormSubmit();
     });
+
+    await test.step("Step 4: Thuc hien viet review", async () => {
+      await productPage.writeReview(
+        reviewData.rating,
+        reviewData.review,
+        reviewData.name,
+        reviewData.email,
+      );
+    });
+
+    await test.step("Step 5: Verify thong tin review tren trang san pham voi dong text", async () => {
+      await productPage.verifyReviewAwaitingApproval();
+    });
+  });
+
+  test("PRODUCT_003: Mo trinh duyet khac va chon khoa hoc", async ({
+    browser,
+  }) => {
+    const otherContext = await browser.newContext();
+    const otherPage = await otherContext.newPage();
+    const otherHomePage = new HomePage(otherPage);
+    const otherProductPage = new ProductPage(otherPage);
+
+    await otherHomePage.navigateHomePage();
+    await otherHomePage.chooseProduct();
+    await otherProductPage.clickReviewTab();
+    await otherPage.bringToFront();
+
+    await otherPage.pause(); 
+
+    await otherProductPage.noReview();
   });
 });

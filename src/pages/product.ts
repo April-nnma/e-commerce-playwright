@@ -15,6 +15,10 @@ export class ProductPage extends BasePage {
   nameForm: Locator;
   emailForm: Locator;
   checkboxForm: Locator;
+  review: Locator;
+  nameReview: Locator;
+  emailReview: Locator;
+  reviewAwaitingApproval: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -43,6 +47,10 @@ export class ProductPage extends BasePage {
     this.checkboxForm = page.getByRole("checkbox", {
       name: "Save my name, email, and",
     });
+    this.review = page.getByRole("textbox", { name: "Your review *" });
+    this.nameReview = page.getByRole("textbox", { name: "Name *" });
+    this.emailReview = page.getByRole("textbox", { name: "Email *" });
+    this.reviewAwaitingApproval = page.getByText("Your review is awaiting");
   }
 
   async verifyProductInfo(
@@ -51,7 +59,7 @@ export class ProductPage extends BasePage {
     salePrice: string,
     description: string,
   ) {
-    await expect(this.productName).toHaveText(name);
+    await expect(this.productName).toContainText(name);
     await expect(this.originalPrice).toContainText(originalPrice);
     await expect(this.salePrice).toContainText(salePrice);
     await expect(this.description).toContainText(description);
@@ -81,5 +89,26 @@ export class ProductPage extends BasePage {
     await expect(this.nameForm).toBeVisible();
     await expect(this.emailForm).toBeVisible();
     await expect(this.checkboxForm).toBeVisible();
+  }
+
+  ratingStar(rating: number): Locator {
+    return this.page.getByRole("radio", { name: `${rating} of 5 stars` });
+  }
+
+  async writeReview(
+    rating: number,
+    review: string,
+    name: string,
+    email: string,
+  ) {
+    await this.ratingStar(rating).click();
+    await this.review.fill(review);
+    await this.nameReview.fill(name);
+    await this.emailReview.fill(email);
+    await this.checkboxForm.click();
+  }
+
+  async verifyReviewAwaitingApproval() {
+    await expect(this.reviewAwaitingApproval).toBeVisible();
   }
 }

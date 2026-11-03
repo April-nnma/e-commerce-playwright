@@ -32,7 +32,6 @@ export class HomePage extends BasePage {
         name: "FullStack Automation QA với",
       })
       .nth(1);
-
     this.originalPrice = page.getByText("2.499.000 $").first();
     this.salePrice = page.getByText("1.749.000 $").first();
     this.buttonAddToCart = page
